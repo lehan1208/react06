@@ -1,4 +1,4 @@
-/* .table > :not(:first-child) {
+.table > :not(:first-child) {
   border-top: none !important;
 }
 
@@ -10,4 +10,4 @@
   content: '*';
   color: red;
   margin-left: 3px;
-} */
+}
