@@ -1,5 +1,6 @@
 import React from "react";
-
+import propTypes from "prop-types";
+import Validator from './../helpers/propTypeValidator';
 function Input(props) {
   const {
     inputRef,
@@ -35,3 +36,13 @@ function Input(props) {
 }
 
 export default Input;
+
+Input.prototype = {
+  inputRef: propTypes.object,
+  id: propTypes.string.isRequired,
+  label: propTypes.string.isRequired,
+  labelSize: Validator.numberBetween(1, 12),
+  lastRow: propTypes.bool,
+  formField: propTypes.object,
+  errorMsg: propTypes.string,
+};
