@@ -6,6 +6,7 @@ import { persistReducer } from "redux-persist";
 
 import thunk from "redux-thunk";
 import { persistStore } from "redux-persist";
+import { loadingBarReducer } from "react-redux-loading-bar";
 import {
   createStateSyncMiddleware,
   initMessageListener,
@@ -14,6 +15,7 @@ import {
 const authPersistConfig = { key: "auth", storage };
 const rootReducers = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
+  loadingBar: loadingBarReducer,
 });
 
 const syncConfig = {

@@ -1,5 +1,6 @@
 import axios from "axios";
 import store from "../stores/index";
+import { showLoading, hideLoading } from "react-redux-loading-bar";
 
 const url = {
   baseUrl: "https://restfulapi.dnd-group.net/api",
@@ -21,13 +22,20 @@ instance.interceptors.request.use((request) => {
   if (state.auth.token) {
     request.headers.Authorization = `Bearer ${state.auth.token}`;
   }
+  store.dispatch(showLoading());
   return request;
 });
 instance.interceptors.response.use(
   (response) => {
+    setTimeout(() => {
+      store.dispatch(hideLoading());
+    }, 100);
     return response;
   },
   (error) => {
+    setTimeout(() => {
+      store.dispatch(hideLoading());
+    }, 100);
     if (!error.response || error.response.status === 0) {
       window.location.href = "/network-error";
     } else {
