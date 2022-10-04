@@ -6,7 +6,8 @@ const url = {
   baseUrl: "https://restfulapi.dnd-group.net/api",
   login: "/login",
   major: "/majors",
-  students: "/students",
+  instructor: "/instructors",
+  student: "/students",
 };
 const instance = axios.create({
   baseURL: url.baseUrl,

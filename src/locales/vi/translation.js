@@ -11,5 +11,11 @@ const VI_TRANSLATION = {
     instructor: "Giảng viên",
     student: "Sinh viên",
     welcomeTo: "Chào mừng",
+    list: "Danh sách",
+    add: "Thêm",
+    majorName: "Tên ngành",
+    close: "Đóng",
+    save: "Lưu",
+
 }
 export default VI_TRANSLATION

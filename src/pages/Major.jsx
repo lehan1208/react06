@@ -6,11 +6,13 @@ import Input from "../components/Input";
 import { toast } from "react-toastify";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { useTranslation } from "react-i18next";
 
 function Major() {
   const [major, setMajor] = useState({ id: 0, name: "" });
   const [majors, setMajors] = useState("");
   const [isShowModal, setIsShowModal] = useState(false);
+  const {t} = useTranslation();
 
   const formik = useFormik({
     initialValues: {
@@ -24,7 +26,6 @@ function Major() {
         .min(5, "Name must be at least 5 characters"),
     }),
     onSubmit: (values) => {
-      console.log("🚀 ~ file: Major.jsx ~ line 25 ~ Major ~ values", values);
     },
   });
 
@@ -108,7 +109,7 @@ function Major() {
             <div className="row">
               <div className="col">
                 <h3 className="card-title">
-                  Major <small className="text-muted">list</small>
+                  {t('major')} <small className="text-muted">{t('list')}</small>
                 </h3>
               </div>
               <div className="col-auto">
@@ -117,7 +118,7 @@ function Major() {
                   className="btn btn-primary"
                   onClick={() => handleEdit(null, 0)}
                 >
-                  <i className="bi-plus-lg" /> Add
+                  <i className="bi-plus-lg" />{t('add')}
                 </button>
               </div>
             </div>
@@ -128,7 +129,7 @@ function Major() {
                 <thead>
                   <tr className="table-primary border-primary">
                     <th style={{ width: 50 }}>#</th>
-                    <th>Major Name</th>
+                    <th>{t('majorName')}</th>
                     <th style={{ width: 80 }} />
                   </tr>
                 </thead>
@@ -176,7 +177,7 @@ function Major() {
           <Input
             lastRow
             type="text"
-            label="Major Name"
+            label={t('majorName')}
             id="txtMajor"
             formField={formik.getFieldProps("name")}
             errorMsg={formik.touched.name && formik.errors.name}
@@ -184,14 +185,14 @@ function Major() {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal}>
-            Close
+          {t('close')}
           </Button>
           <Button
             variant="primary"
             disabled={!formik.dirty || !formik.isValid}
             onClick={formik.handleSubmit}
           >
-            Save
+            {t('save')}
           </Button>
         </Modal.Footer>
       </Modal>

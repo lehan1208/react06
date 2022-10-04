@@ -6,10 +6,8 @@ import Header from "./Header";
 
 function DefaultLayout() {
   const isLoggedIn = useSelector((state) => {
-    console.log("🚀 ~ file: DefaultLayout.js ~ line 9 ~ DefaultLayout ~ state", state)
     return state.auth.isLoggedIn
   })
-  console.log("🚀 ~ file: DefaultLayout.js ~ line 9 ~ DefaultLayout ~ isLoggedIn", isLoggedIn)
   return (
     <>
       {!isLoggedIn ? (
