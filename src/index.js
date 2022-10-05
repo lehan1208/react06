@@ -28,10 +28,10 @@ root.render(
           style={{ height: "2px" }}
         />
       </div>
-      <React.StrictMode>
-        <ToastContainer />
+        <ToastContainer 
+        position="bottom-right"
+        />
         <App />
-      </React.StrictMode>
     </PersistGate>
   </Provider>
 );

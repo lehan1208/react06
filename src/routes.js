@@ -8,7 +8,7 @@ export const routes = [
   { path: '', component: <Home /> },
   { path: '/home', component: <Home /> },
   { path: '/major', component: <Major /> },
-  // { path: '/instructor', component: <Instructor /> },
-  // { path: '/student', component: <Student /> },
+  { path: '/instructor', component: <Instructor /> },
+  { path: '/student', component: <Student /> },
   { path: '/not-found', component: <NotFound /> },
 ];

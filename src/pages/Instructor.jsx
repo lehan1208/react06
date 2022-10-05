@@ -1,152 +1,122 @@
 import React, { useEffect, useState } from "react";
+import { Card, Container } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { toast } from "react-toastify";
-import Input from "../components/Input";
-import majorService from "../services/majorService";
+import instructorService from "./../services/instructorService";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
 function Instructor() {
   const [isShowModal, setIsShowModal] = useState(false);
-  const [instructor, setInstructor] = useState({
-    id: "0",
-    firstName: "",
-    lastName: "",
-    gender: "",
-    phone: "",
-    email: "",
+  const [instructorList, setInstructorList] = useState([]);
+
+  const formik = useFormik({
+    initialValues: {
+      id: 0,
+      code: "",
+      firstName: "",
+      lastName: "",
+      gender: null,
+      phone: "",
+      email: "",
+    },
+    validationSchema: Yup.object({
+      id: Yup.number().required(""),
+      code: Yup.string()
+        .required("Code is required")
+        .min(5, "Code must be at least 5 characters"),
+      firstName: Yup.string()
+
+        .required("First name is required")
+        .min(2, "First name must be at least 3 characters"),
+      lastName: Yup.string()
+        .required("Last name is required")
+        .min(2, "Last name must be at least 3 characters"),
+      gender: Yup.number().required("Please select gender"),
+      phone: Yup.string()
+
+        .matches(/^(\d{10,11})$/, "Phone number is invalid")
+        .required("Phone is required"),
+      email: Yup.string()
+        .required("Email is required")
+        .email("Email is invalid"),
+    }),
+    onSubmit: (values) => {
+      handleSubmit(values);
+    },
   });
 
-  const initInstructorList = [
-    {
-      id: "01-03-9384",
-      firstName: "Minh Tâm",
-      lastName: "Trần ",
-      gender: "male",
-      phone: "0935875636",
-      email: "tamtm@yahoo.com",
-    },
-    {
-      id: "01-03-9344",
-      firstName: "Thị Thanh",
-      lastName: "Nguyễn ",
-      gender: "female",
-      phone: "0937938573",
-      email: "thanhnt@yahoo.com",
-    },
-    {
-      id: "01-04-9846",
-      firstName: "Thanh Tuấn",
-      lastName: "Lê ",
-      gender: "male",
-      phone: "0918373635",
-      email: "tuantl@yahoo.com",
-    },
-    {
-      id: "01-04-8363",
-      firstName: "La Si",
-      lastName: "Đinh ",
-      gender: "male",
-      phone: "0917628363",
-      email: "sidl@yahoo.com",
-    },
-  ];
-  const [instructorList, setInstructorList] = useState(initInstructorList)
-
-  const handleCloseModal = () => setIsShowModal(false);
-  const handleShowModal = () => setIsShowModal(true);
-
-  const handleOnChange = (e, key) => {
-    const newInstructor = { ...instructor };
-    newInstructor[key] = e.target.value;
-    setInstructor(newInstructor);
+  const loadData = () => {
+    instructorService.list().then((res) => setInstructorList(res.data));
   };
   useEffect(() => {
-    console.log("🚀 ~ file: Instructor.jsx ~ line 61 ~ handleOnChange ~ newInstructor",instructor);
-  }, [instructor]);
+    loadData();
+  }, []);
 
-  const handleAddInstructor = (e) => {
-    e.preventDefault();
-    const newInstructorList = [...instructorList];
-    newInstructorList.push(instructor);
-    setInstructorList(newInstructorList);
-    handleCloseModal();
-  }
-  
-  console.log("🚀 ~ file: Instructor.jsx ~ line 69 ~ handleAddInstructor ~ instructorList", instructorList)
+  const handleEdit = (e, id) => {
+    if (e) e.preventDefault();
+    if (id === 0) {
+      formik.resetForm();
+      setIsShowModal(true);
+    } else {
+      instructorService.get(id).then((res) => {
+        if (res.errorCode === 0) {
+          formik.setValues(res.data);
+          setIsShowModal(true);
+        } else {
+          toast.error("Load instructor failed!");
+        }
+      });
+    }
+  };
 
+  const handleDeleteMajor = (e, id) => {
+    if (e) e.preventDefault();
+    instructorService.delete(id).then((res) => {
+      if (res.errorCode === 0) {
+        toast.success("Delete instructor successfully!");
+        loadData();
+      } else {
+        toast.warning("Delete instructor failed!");
+      }
+    });
+  };
 
-  // const handleEdit = (e, id) => {
-  //   if (e) e.preventDefault();
-  //   if (Number(id) === 0) {
-  //     setMajor({ id: 0, name: "" });
-  //     handleShowModal();
-  //   } else {
-  //     majorService.get(id).then((res) => {
-  //       if (res.errorCode === 0) {
-  //         setMajor(res.data);
-  //         handleShowModal();
-  //       } else {
-  //         toast.error("Load major failed!");
-  //       }
-  //     });
-  //   }
-  // };
-
-  // const handleChangeMajor = (e) => {
-  //   const newMajor = { ...major };
-  //   newMajor[e.target.name] = e.target.value;
-  //   setMajor(newMajor);
-  // };
-
-  // useEffect(() => {
-  //   loadData();
-  // }, []);
-
-  // const loadData = () => {
-  //   majorService.list().then((res) => {
-  //     setMajors(res.data);
-  //   });
-  // };
-
-  // const handleDeleteMajor = (e, id) => {
-  //   e.preventDefault();
-  //   majorService.delete(id).then((res) => {
-  //     if (res.errorCode === 0) {
-  //       loadData();
-  //       toast.warn("Delete major successfully");
-  //     } else {
-  //       toast.error("Delete major failed");
-  //     }
-  //   });
-  // };
-
-  // const handleSubmit = (e) => {
-  //   e.preventDefault(e);
-  //   if (major.id !== 0) {
-  //     majorService.update(major.id, major).then((res) => {
-  //       if (res.errorCode === 0) {
-  //         loadData();
-  //         handleCloseModal();
-  //         toast.success("Update major successfully");
-  //       } else {
-  //         toast.error("Update major failed");
-  //       }
-  //     });
-  //   } else {
-  //     majorService.add(major).then((res) => {
-  //       if (res.errorCode === 0) {
-  //         loadData();
-  //         handleCloseModal();
-  //         toast.success("Add major successfully");
-  //       } else {
-  //         toast.error("Add major failed");
-  //       }
-  //     });
-  //   }
-  // };
+  const handleSubmit = (data) => {
+    if (data.id === 0) {
+      instructorService.add(data).then((res) => {
+        if (res.errorCode === 0) {
+          toast.success("Add instructor successfully!");
+          setIsShowModal(false);
+          loadData();
+        } else {
+          toast.warning("Add instructor failed!");
+        }
+      });
+    } else {
+      // update
+      instructorService.update(data.id, data).then((res) => {
+        if (res.errorCode === 0) {
+          toast.success("Update instructor successfully!");
+          setIsShowModal(false);
+          loadData();
+        } else {
+          toast.warning("Update instructor failed!");
+        }
+      });
+    }
+  };
 
   return (
     <>
+      <Container className="mt-4">
+        <Card className="border-primary bt-5">
+          <Card.Header className="bg-primary text-white">
+            <h4 className="text-center">Instructor List</h4>
+          </Card.Header>
+        </Card>
+      </Container>
       <div className="container mt-4">
         <div className="card border-primary bt-5">
           <div className="card-header">
@@ -160,7 +130,7 @@ function Instructor() {
                 <button
                   type="button"
                   className="btn btn-primary"
-                  onClick={() => setIsShowModal(true)}
+                  onClick={(e) => handleEdit(null, 0)}
                 >
                   <i className="bi-plus-lg" /> Add
                 </button>
@@ -188,7 +158,9 @@ function Instructor() {
                       <tr key={i}>
                         <td>{i + 1}</td>
                         <td>{m.id}</td>
-                        <td>{m.lastName} {m.firstName}</td>
+                        <td>
+                          {m.lastName} {m.firstName}
+                        </td>
                         <td className="text-center">
                           {m.gender === "male" ? (
                             <i className="bi bi-gender-male text-primary" />
@@ -199,15 +171,12 @@ function Instructor() {
                         <td>{m.phone}</td>
                         <td>{m.email}</td>
                         <td>
-                          <a
-                            href="/#"
-                            // onClick={(e) => handleEdit(e, m.id)}
-                          >
+                          <a href="/#" onClick={(e) => handleEdit(e, m.id)}>
                             <i className="bi-pencil-square text-primary" />
                           </a>
                           <a
                             href="/#"
-                            // onClick={(e) => handleDeleteMajor(e, m.id)}
+                            onClick={(e) => handleDeleteMajor(e, m.id)}
                           >
                             <i className="bi-trash text-danger" />
                           </a>
@@ -224,83 +193,108 @@ function Instructor() {
         show={isShowModal}
         size="lg"
         centered
-        onHide={handleCloseModal}
+        onHide={() => setIsShowModal(false)}
         backdrop="static"
         keyboard={false}
       >
         <Modal.Header closeButton>
           <Modal.Title>
-            {instructor.id > 0 ? "Edit" : "New"} Instructor
+            {formik.values.id === 0 ? "New" : "Edit"} Instructor
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <form>
             <div className="form-row row mb-3">
-              <label className="col-md-2 required align-items-center">
+              <label className="col-md-2 required align-items-center required">
                 Intructor ID
               </label>
               <div className="col-md-5">
                 <input
                   type="text"
-                  className="form-control"
+                  className={`form-control ${
+                    formik.errors.code ? "is-invalid" : ""
+                  }`}
                   id="id"
+                  name="'code"
                   placeholder="Intructor ID"
-                  onChange={(e) => handleOnChange(e, "id")}
+                  {...formik.getFieldProps("code")}
                 />
+                {formik.errors.code ? (
+                  <div className="invalid-feedback">{formik.errors.code}</div>
+                ) : (
+                  ""
+                )}
               </div>
             </div>
             <div className="form-group row mb-3">
-              <label class="col-md-2 required">Full Name</label>
-              <div class="col-md-5 col-12">
+              <label className="col-md-2 required">Full Name</label>
+              <div className="col-md-5 col-12">
                 <input
                   type="text"
-                  class="form-control"
+                  className={`form-control ${
+                    formik.errors.lastName ? "is-invalid" : ""
+                  }`}
+                  name="lastName"
                   placeholder="Last name"
-                  onChange={(e) => handleOnChange(e, "lastName")}
+                  {...formik.getFieldProps("lastName")}
                 />
+                {formik.errors.lastName ? (
+                  <div className="invalid-feedback">
+                    {formik.errors.lastName}
+                  </div>
+                ) : (
+                  ""
+                )}
               </div>
-              <div class="col-md-5 col-12">
+              <div className="col-md-5 col-12">
                 <input
                   type="text"
-                  class="form-control"
+                  name="firstName"
+                  className={`form-control ${
+                    formik.errors.firstName ? "is-invalid" : ""
+                  }`}
                   placeholder="First name"
-                  onChange={(e) => handleOnChange(e, "firstName")}
+                  {...formik.getFieldProps("firstName")}
                 />
+                {formik.errors.firstName ? (
+                  <div className="invalid-feedback">
+                    {formik.errors.firstName}
+                  </div>
+                ) : (
+                  ""
+                )}
               </div>
             </div>
             <div className="form-group row mb-3">
-              <label class="col-form-label col-sm-2 required">Gender</label>
-              <div class="col-sm-10 row">
-                <div class="form-check col-sm-2">
+              <label className="col-form-label col-sm-2 required">Gender</label>
+              <div className="col-sm-10 row">
+                <div className="form-check col-sm-2">
                   <input
-                    class="form-check-input"
+                    className={`form-check-input ${
+                      formik.errors.gender ? "is-invalid" : ""
+                    }`}
                     type="radio"
-                    name="gridRadios"
+                    name="gender"
                     id="male"
-                    value="male"
-                    checked={instructor.gender === "male"}
-                    onChange={() =>
-                      setInstructor({ ...instructor, gender: "male" })
-                    }
-                    // onClick={() => setInstructor({ ...instructor, gender: 'male' })}
+                    checked={formik.values.gender === 1}
+                    onChange={() => formik.setFieldValue("gender", 1)}
                   />
-                  <label class="form-check-label" htmlFor="male">
+                  <label className="form-check-label" htmlFor="male">
                     Male
                   </label>
                 </div>
-                <div class="form-check col-sm-2">
+                <div className="form-check col-sm-2">
                   <input
-                    class="form-check-input"
+                    className={`form-check-input ${
+                      formik.errors.gender ? "is-invalid" : ""
+                    }`}
                     type="radio"
-                    name="gridRadios"
+                    name="gender"
                     id="female"
-                    value="female"
-                    checked={instructor.gender === "female"}
-                    onChange={() =>
-                      setInstructor({ ...instructor, gender: "female" })
-                    }
+                    checked={formik.values.gender === 0}
+                    onChange={() => formik.setFieldValue("gender", 0)}
                   />
-                  <label class="form-check-label" htmlFor="female">
+                  <label className="form-check-label" htmlFor="female">
                     Female
                   </label>
                 </div>
@@ -313,11 +307,20 @@ function Instructor() {
               <div className="col-md-5 col-12">
                 <input
                   type="text"
-                  className="form-control"
+                  className={`form-control ${
+                    formik.errors.phone ? "is-invalid" : ""
+                  }`}
                   id="id"
-                  placeholder="Phone number"
-                  onChange={(e) => handleOnChange(e, "phone")}
+                  name="phone"
+                  maxLength={10}
+                  placeholder="Enter phone Number"
+                  {...formik.getFieldProps("phone")}
                 />
+                {formik.errors.phone ? (
+                  <div className="invalid-feedback">{formik.errors.phone}</div>
+                ) : (
+                  ""
+                )}
               </div>
             </div>
             <div className="form-row row">
@@ -325,22 +328,31 @@ function Instructor() {
               <div className="col">
                 <input
                   type="email"
-                  className="form-control"
+                  className={`form-control ${
+                    formik.errors.email ? "is-invalid" : ""
+                  }`}
                   id="id"
+                  name="email"
                   placeholder="Email address"
-                  onChange={(e) => handleOnChange(e, "email")}
+                  {...formik.getFieldProps("email")}
                 />
+                {formik.errors.email ? (
+                  <div className="invalid-feedback">{formik.errors.email}</div>
+                ) : (
+                  ""
+                )}
               </div>
             </div>
           </form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>
+          <Button variant="secondary" onClick={() => setIsShowModal(false)}>
             Close
           </Button>
           <Button
             variant="primary"
-            onClick={handleAddInstructor}
+            onClick={() => formik.handleSubmit()}
+            disabled={!formik.dirty || !formik.isValid}
           >
             Save
           </Button>
